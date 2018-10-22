@@ -1,3 +1,6 @@
+test-files/input*.txt
+test-files/output*.txt
+
 # =========================
 # Operating System Files
 # =========================
