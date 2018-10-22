@@ -1,4 +1,4 @@
-package org.hildan.algorithms;
+package org.hildan.algorithms.knapsack;
 
 import java.util.ArrayList;
 import java.util.Arrays;

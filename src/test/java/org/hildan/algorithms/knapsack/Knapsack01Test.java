@@ -1,11 +1,11 @@
-package org.hildan.algorithms;
+package org.hildan.algorithms.knapsack;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.hildan.algorithms.Knapsack01.Item;
-import org.hildan.algorithms.Knapsack01.Solution;
+import org.hildan.algorithms.knapsack.Knapsack01.Item;
+import org.hildan.algorithms.knapsack.Knapsack01.Solution;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
