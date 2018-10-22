@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class Knapsack01 {
+class Knapsack01 {
 
     private final int capacity;
 
@@ -13,18 +13,18 @@ public class Knapsack01 {
 
     private final int[][] maxValue;
 
-    public Knapsack01(int capacity, Item[] items) {
+    Knapsack01(int capacity, Item[] items) {
         this.capacity = capacity;
         this.items = items;
         this.maxValue = new int[items.length + 1][capacity + 1];
     }
 
-    public int solveMaxValue() {
+    int solveMaxValue() {
         solveSubProblems();
         return maxValue[items.length][capacity];
     }
 
-    public Solution solveWithItems() {
+    Solution solveWithItems() {
         solveSubProblems();
 
         int v = maxValue[items.length][capacity];
@@ -67,7 +67,7 @@ public class Knapsack01 {
         final int value;
         final int weight;
 
-        public Item(int value, int weight) {
+        Item(int value, int weight) {
             this.value = value;
             this.weight = weight;
         }
