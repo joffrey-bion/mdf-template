@@ -3,6 +3,7 @@ package org.hildan.algorithms;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class Knapsack01 {
 
@@ -70,6 +71,28 @@ public class Knapsack01 {
             this.value = value;
             this.weight = weight;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Item item = (Item) o;
+            return value == item.value && weight == item.weight;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value, weight);
+        }
+
+        @Override
+        public String toString() {
+            return "Item{" + "value=" + value + ", weight=" + weight + '}';
+        }
     }
 
     static class Solution {
@@ -80,6 +103,28 @@ public class Knapsack01 {
         Solution(int value, List<Item> items) {
             this.value = value;
             this.items = items;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Solution solution = (Solution) o;
+            return value == solution.value && Objects.equals(items, solution.items);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value, items);
+        }
+
+        @Override
+        public String toString() {
+            return "Solution{" + "value=" + value + ", items=" + items + '}';
         }
     }
 }
