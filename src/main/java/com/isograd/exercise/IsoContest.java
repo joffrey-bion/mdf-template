@@ -24,14 +24,33 @@ public class IsoContest {
         return list;
     }
 
-    private static <T> List<T> readSizedList(Scanner sc, Function<String, T> itemReader) {
+    private static <T> T[] readNLines(Scanner sc, int n, Function<String, T> itemReader,
+            Function<Integer, T[]> arrayCreator) {
+        T[] outArray = arrayCreator.apply(n);
+        fillFromLines(sc, itemReader, outArray);
+        return outArray;
+    }
+
+    private static <T> void fillFromLines(Scanner sc, Function<String, T> itemReader, T[] outArray) {
+        for (int i = 0; i < outArray.length; i++) {
+            outArray[i] = itemReader.apply(sc.nextLine());
+        }
+    }
+
+    /**
+     * Reads a line containing the number N of elements, and then reads N lines from the input as elements.
+     */
+    private static <T> List<T> readList(Scanner sc, Function<String, T> itemReader) {
         int n = readIntLine(sc);
         return readNLines(sc, n, itemReader);
     }
 
-    private static <T> void fillFromLines(Scanner sc, T[] outArray, Function<String, T> itemReader) {
-        for (int i = 0; i < outArray.length; i++) {
-            outArray[i] = itemReader.apply(sc.nextLine());
-        }
+    /**
+     * Reads a line containing the number N of elements, and then reads N lines from the input as elements.
+     */
+    private static <T> T[] readArray(Scanner sc, Function<String, T> itemReader,
+            Function<Integer, T[]> arrayCreator) {
+        int n = readIntLine(sc);
+        return readNLines(sc, n, itemReader, arrayCreator);
     }
 }
