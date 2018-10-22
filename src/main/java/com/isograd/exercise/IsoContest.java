@@ -74,3 +74,42 @@ class MdfReader {
         return readNLinesAsArray(n, itemReader, arrayCreator);
     }
 }
+
+class MdfUtils {
+
+    static <K, V extends Comparable<V>> List<K> findMin(Map<K, V> map, V maxValue) {
+        List<K> minKeys = new ArrayList<>();
+        V minValue = maxValue;
+        for (Entry<K, V> entry : map.entrySet()) {
+            K k = entry.getKey();
+            V v = entry.getValue();
+            int comp = v.compareTo(minValue);
+            if (comp < 0) {
+                minValue = v;
+                minKeys.clear();
+                minKeys.add(k);
+            } else if (comp == 0) {
+                minKeys.add(k);
+            }
+        }
+        return minKeys;
+    }
+
+    static <K, V extends Comparable<V>> List<K> findMax(Map<K, V> map, V minValue) {
+        List<K> maxKeys = new ArrayList<>();
+        V maxValue = minValue;
+        for (Entry<K, V> entry : map.entrySet()) {
+            K k = entry.getKey();
+            V v = entry.getValue();
+            int comp = v.compareTo(maxValue);
+            if (comp > 0) {
+                maxValue = v;
+                maxKeys.clear();
+                maxKeys.add(k);
+            } else if (comp == 0) {
+                maxKeys.add(k);
+            }
+        }
+        return maxKeys;
+    }
+}
