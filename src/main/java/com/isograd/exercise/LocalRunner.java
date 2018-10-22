@@ -20,6 +20,10 @@ public class LocalRunner {
 
     public static void main(String[] args) throws IOException {
         List<TestCase> testCases = findTestCases();
+        if (testCases.isEmpty()) {
+            System.err.println("No test files provided");
+            System.exit(1);
+        }
 
         PrintStream stdout = System.out;
 
