@@ -3,6 +3,7 @@ package com.isograd.exercise;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.*;
+import java.util.stream.*;
 
 public class IsoContest {
 
@@ -83,6 +84,20 @@ class MdfReader {
 
 @SuppressWarnings("unused")
 class MdfUtils {
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    static int min(List<Integer> ints) {
+        return ints.stream().reduce(Integer::min).get();
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    static int max(List<Integer> ints) {
+        return ints.stream().reduce(Integer::max).get();
+    }
+
+    static int sum(List<Integer> ints) {
+        return ints.stream().reduce(0, Integer::sum);
+    }
 
     /**
      * Find all keys mapped to the min value of the given map.
