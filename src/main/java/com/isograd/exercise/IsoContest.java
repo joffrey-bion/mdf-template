@@ -81,7 +81,7 @@ class MdfReader {
     }
 }
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"WeakerAccess", "unused"})
 class MdfUtils {
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
@@ -101,6 +101,16 @@ class MdfUtils {
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     static double avg(List<Integer> ints) {
         return ints.stream().mapToInt(i -> i).average().getAsDouble();
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    static double variance(List<Integer> ints) {
+        double avg = avg(ints);
+        return ints.stream().mapToDouble(i -> i * i - avg).average().getAsDouble();
+    }
+
+    static double stddev(List<Integer> ints) {
+        return Math.sqrt(variance(ints));
     }
 
     /**
