@@ -154,4 +154,10 @@ class MdfUtils {
         }
         return maxKeys;
     }
+
+    static <T> Map<T, Integer> occurrences(List<T> elements) {
+        Map<T, Integer> occurrences = new HashMap<>();
+        elements.forEach(e -> occurrences.merge(e, 1, Integer::sum));
+        return occurrences;
+    }
 }
