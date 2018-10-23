@@ -1,18 +1,71 @@
 package com.isograd.exercise;
 
-import java.util.*;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.*;
+import java.util.Scanner;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class IsoContest {
+
+    static class Light {
+        LocalTime time;
+        LocalTime endTime;
+
+        String direction;
+
+        public Light(String time, String direction) {
+            this.time = LocalTime.parse(time);
+            this.endTime = this.time.plus(Duration.ofMinutes(3));
+            this.direction = direction;
+        }
+
+        public boolean collideWith(Light light) {
+            if (this.time.isBefore(light.time)) {
+                return this.endTime.isAfter(light.time);
+            } else if (this.time.isAfter(light.time)) {
+                return this.time.isBefore(light.endTime);
+            } else {
+                return true;
+            }
+        }
+    }
 
     public static void main(String[] argv) {
         Scanner sc = new Scanner(System.in);
         MdfReader reader = new MdfReader(sc);
 
-        // TODO
+        int n = reader.readIntLine();
+        List<Light> lights = reader.readNLinesAsList(n, r -> {
+            String[] s = r.sc.nextLine().split("\\s");
+            return new Light(s[0], s[1]);
+        });
 
-        System.out.println();
+        List<Light> hLights = lights.stream()
+                                    .filter(l -> l.direction.equals("E") || l.direction.equals("O"))
+                                    .sorted(Comparator.comparing(l -> l.time))
+                                    .collect(Collectors.toList());
+        List<Light> vLights = lights.stream()
+                                    .filter(l -> l.direction.equals("N") || l.direction.equals("S"))
+                                    .sorted(Comparator.comparing(l -> l.time))
+                                    .collect(Collectors.toList());
+
+        for (Light hLight : hLights) {
+            for (Light vLight : vLights) {
+                if (hLight.collideWith(vLight)) {
+                    System.out.println("COLLISION");
+                    return;
+                }
+            }
+        }
+
+        System.out.println("OK");
     }
 
 }
