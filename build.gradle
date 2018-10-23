@@ -12,3 +12,10 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+task cleanTestFiles(type: Delete) {
+    delete fileTree('test-files') {
+        include 'input*'
+        include 'output*'
+    }
+}
