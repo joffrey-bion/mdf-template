@@ -6,59 +6,73 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 public class AStarGrid {
-    /** horizontal/vertical cost */
-    private int hvCost;
-    private int diagonalCost;
-    private Node[][] grid;
+
+    private final boolean acceptDiagonal;
+
+    private final int hCost;
+    private final int vCost;
+    private final int dCost;
+
+    private final Node[][] grid;
+
     private PriorityQueue<Node> openList;
     private List<Node> closedList;
-    private Node initialNode;
-    private Node finalNode;
 
-    public AStarGrid(int rows, int cols, Node initialNode, Node finalNode, int hvCost, int diagonalCost) {
-        this.hvCost = hvCost;
-        this.diagonalCost = diagonalCost;
-        this.initialNode = initialNode;
-        this.finalNode = finalNode;
-        this.grid = new Node[rows][cols];
-        this.openList = new PriorityQueue<>(Comparator.comparingInt(Node::getF));
-        setNodes();
-        this.closedList = new ArrayList<>();
+    public AStarGrid(Node[][] grid, int hCost, int vCost, int dCost, boolean acceptDiagonal) {
+        this.hCost = hCost;
+        this.vCost = vCost;
+        this.dCost = dCost;
+        this.grid = grid;
+        this.acceptDiagonal = acceptDiagonal;
     }
 
-    private void setNodes() {
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[0].length; j++) {
+    static Node[][] createEmptyGrid(int rows, int cols) {
+        Node[][] grid = new Node[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
                 Node node = new Node(i, j);
-                node.calculateHeuristic(finalNode);
-                this.grid[i][j] = node;
+                grid[i][j] = node;
             }
         }
+        return grid;
     }
 
-    public void setBlocks(int[][] blocksArray) {
-        for (int i = 0; i < blocksArray.length; i++) {
-            int row = blocksArray[i][0];
-            int col = blocksArray[i][1];
-            setBlock(row, col);
-        }
-    }
-
-    public List<Node> findPath() {
+    public List<Node> shortestPath(Node initialNode, Node finalNode) {
+        initializeNodes(finalNode);
+        this.openList = new PriorityQueue<>(Comparator.comparingInt(Node::getF));
+        this.closedList = new ArrayList<>();
         openList.add(initialNode);
-        while (!isEmpty(openList)) {
+        while (!openList.isEmpty()) {
             Node currentNode = openList.poll();
             closedList.add(currentNode);
-            if (isFinalNode(currentNode)) {
+            if (finalNode.equals(currentNode)) {
                 return getPath(currentNode);
-            } else {
-                addAdjacentNodes(currentNode);
             }
+            expandNeighbours(currentNode);
         }
         return new ArrayList<>();
     }
 
-    private List<Node> getPath(Node currentNode) {
+    private void initializeNodes(Node finalNode) {
+        for (Node[] row : grid) {
+            for (Node node : row) {
+                node.setH(computeH(node, finalNode, acceptDiagonal));
+                node.setG(0);
+            }
+        }
+    }
+
+    private static int computeH(Node n1, Node n2, boolean diagonalAccepted) {
+        int hDist = Math.abs(n1.getRow() - n2.getRow());
+        int vDist = Math.abs(n1.getCol() - n2.getCol());
+        if (diagonalAccepted) {
+            return Math.max(hDist, vDist);
+        } else {
+            return hDist + vDist;
+        }
+    }
+
+    private static List<Node> getPath(Node currentNode) {
         List<Node> path = new ArrayList<>();
         path.add(currentNode);
         Node parent;
@@ -69,92 +83,67 @@ public class AStarGrid {
         return path;
     }
 
-    private void addAdjacentNodes(Node currentNode) {
-        addAdjacentUpperRow(currentNode);
-        addAdjacentMiddleRow(currentNode);
-        addAdjacentLowerRow(currentNode);
-    }
-
-    private void addAdjacentLowerRow(Node currentNode) {
+    private void expandNeighbours(Node currentNode) {
         int row = currentNode.getRow();
         int col = currentNode.getCol();
-        int lowerRow = row + 1;
-        if (lowerRow < grid.length) {
+        int height = grid.length;
+        int width = grid[0].length;
+        if (row - 1 >= 0) {
             if (col - 1 >= 0) {
-                checkNode(currentNode, col - 1, lowerRow, diagonalCost); // Comment this line if diagonal movements are not allowed
+                expand(currentNode, col - 1, row - 1, dCost); // Comment this if diagonal movements are not allowed
             }
-            if (col + 1 < grid[0].length) {
-                checkNode(currentNode, col + 1, lowerRow, diagonalCost); // Comment this line if diagonal movements are not allowed
+            if (col + 1 < width) {
+                expand(currentNode, col + 1, row - 1, dCost); // Comment this if diagonal movements are not allowed
             }
-            checkNode(currentNode, col, lowerRow, hvCost);
+            expand(currentNode, col, row - 1, vCost);
         }
-    }
-
-    private void addAdjacentMiddleRow(Node currentNode) {
-        int row = currentNode.getRow();
-        int col = currentNode.getCol();
-        int middleRow = row;
         if (col - 1 >= 0) {
-            checkNode(currentNode, col - 1, middleRow, hvCost);
+            expand(currentNode, col - 1, row, hCost);
         }
-        if (col + 1 < grid[0].length) {
-            checkNode(currentNode, col + 1, middleRow, hvCost);
+        if (col + 1 < width) {
+            expand(currentNode, col + 1, row, hCost);
         }
-    }
-
-    private void addAdjacentUpperRow(Node currentNode) {
-        int row = currentNode.getRow();
-        int col = currentNode.getCol();
-        int upperRow = row - 1;
-        if (upperRow >= 0) {
+        if (row + 1 < height) {
             if (col - 1 >= 0) {
-                checkNode(currentNode, col - 1, upperRow, diagonalCost); // Comment this if diagonal movements are not allowed
+                expand(currentNode, col - 1, row + 1, dCost); // Comment this line if diagonal movements are not allowed
             }
-            if (col + 1 < grid[0].length) {
-                checkNode(currentNode, col + 1, upperRow, diagonalCost); // Comment this if diagonal movements are not allowed
+            if (col + 1 < width) {
+                expand(currentNode, col + 1, row + 1, dCost); // Comment this line if diagonal movements are not allowed
             }
-            checkNode(currentNode, col, upperRow, hvCost);
+            expand(currentNode, col, row + 1, vCost);
         }
     }
 
-    private void checkNode(Node currentNode, int col, int row, int cost) {
+    private void expand(Node currentNode, int col, int row, int localCost) {
         Node adjacentNode = grid[row][col];
-        if (!adjacentNode.isBlock() && !closedList.contains(adjacentNode)) {
-            if (!openList.contains(adjacentNode)) {
-                adjacentNode.setNodeData(currentNode, cost);
-                openList.add(adjacentNode);
-            } else {
-                boolean changed = adjacentNode.checkBetterPath(currentNode, cost);
-                if (changed) {
-                    // Remove and Add the changed node, so that the PriorityQueue can sort again its
-                    // contents with the modified "finalCost" value of the modified node
-                    openList.remove(adjacentNode);
-                    openList.add(adjacentNode);
-                }
-            }
+        if (adjacentNode.isBlock() || closedList.contains(adjacentNode)) {
+            return;
+        }
+        int newGCost = currentNode.getG() + localCost;
+        if (!openList.contains(adjacentNode)) {
+            adjacentNode.setBetterCost(currentNode, localCost);
+            openList.add(adjacentNode);
+        } else if (newGCost < adjacentNode.getG()) {
+            adjacentNode.setBetterCost(currentNode, localCost);
+            // Remove and Add the changed node, so that the PriorityQueue can sort again its
+            // contents with the modified "finalCost" value of the modified node
+            openList.remove(adjacentNode);
+            openList.add(adjacentNode);
         }
     }
 
-    private boolean isFinalNode(Node currentNode) {
-        return currentNode.equals(finalNode);
-    }
-
-    private boolean isEmpty(PriorityQueue<Node> openList) {
-        return openList.size() == 0;
-    }
-
-    private void setBlock(int row, int col) {
-        this.grid[row][col].setBlock(true);
-    }
-
-    class Node {
+    static class Node {
 
         private int g;
-        private int f;
+
         private int h;
+
         private int row;
+
         private int col;
+
         private boolean isBlock;
+
         private Node parent;
 
         public Node(int row, int col) {
@@ -163,29 +152,19 @@ public class AStarGrid {
             this.col = col;
         }
 
-        public void calculateHeuristic(Node finalNode) {
-            this.h = Math.abs(finalNode.getRow() - getRow()) + Math.abs(finalNode.getCol() - getCol());
-        }
-
-        public void setNodeData(Node currentNode, int cost) {
-            int gCost = currentNode.getG() + cost;
-            setParent(currentNode);
+        public void setBetterCost(Node newParent, int stepCost) {
+            int gCost = newParent.getG() + stepCost;
+            setParent(newParent);
             setG(gCost);
-            calculateFinalCost();
         }
 
         public boolean checkBetterPath(Node currentNode, int cost) {
             int gCost = currentNode.getG() + cost;
             if (gCost < getG()) {
-                setNodeData(currentNode, cost);
+                setBetterCost(currentNode, cost);
                 return true;
             }
             return false;
-        }
-
-        private void calculateFinalCost() {
-            int finalCost = getG() + getH();
-            setF(finalCost);
         }
 
         @Override
@@ -199,8 +178,8 @@ public class AStarGrid {
             return "Node [row=" + row + ", col=" + col + "]";
         }
 
-        public int getH() {
-            return h;
+        public int getF() {
+            return g + h;
         }
 
         public void setH(int h) {
@@ -213,14 +192,6 @@ public class AStarGrid {
 
         public void setG(int g) {
             this.g = g;
-        }
-
-        public int getF() {
-            return f;
-        }
-
-        public void setF(int f) {
-            this.f = f;
         }
 
         public Node getParent() {

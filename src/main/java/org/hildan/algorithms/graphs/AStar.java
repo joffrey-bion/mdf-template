@@ -33,10 +33,8 @@ public class AStar<T> {
      * @return the path from source to destination
      */
     public List<T> aStar(T source, T destination) {
-        /**
-         * http://stackoverflow.com/questions/20344041/why-does-priority-queue-has-default-initial-capacity-of-11
-         */
-        final Queue<Node<T>> openQueue = new PriorityQueue<>(Comparator.comparing(Node::getF));
+
+        Queue<Node<T>> openQueue = new PriorityQueue<>(Comparator.comparing(Node::getF));
 
         Node<T> sourceNode = graph.getNodeData(source);
         sourceNode.setG(0);
