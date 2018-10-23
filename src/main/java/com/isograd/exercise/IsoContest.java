@@ -20,7 +20,7 @@ public class IsoContest {
 @SuppressWarnings({"WeakerAccess", "unused"})
 class MdfReader {
 
-    private final Scanner sc;
+    final Scanner sc;
 
     MdfReader(Scanner sc) {
         this.sc = sc;
@@ -44,30 +44,30 @@ class MdfReader {
         return ints;
     }
 
-    <T> List<T> readNLinesAsList(int n, Function<Scanner, T> itemReader) {
+    <T> List<T> readNLinesAsList(int n, Function<MdfReader, T> itemReader) {
         List<T> list = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
-            list.add(itemReader.apply(sc));
+            list.add(itemReader.apply(this));
         }
         return list;
     }
 
-    <T> T[] readNLinesAsArray(int n, Function<Scanner, T> itemReader, Function<Integer, T[]> arrayCreator) {
+    <T> T[] readNLinesAsArray(int n, Function<MdfReader, T> itemReader, Function<Integer, T[]> arrayCreator) {
         T[] outArray = arrayCreator.apply(n);
         fillFromLines(itemReader, outArray);
         return outArray;
     }
 
-    <T> void fillFromLines(Function<Scanner, T> itemReader, T[] outArray) {
+    <T> void fillFromLines(Function<MdfReader, T> itemReader, T[] outArray) {
         for (int i = 0; i < outArray.length; i++) {
-            outArray[i] = itemReader.apply(sc);
+            outArray[i] = itemReader.apply(this);
         }
     }
 
     /**
      * Reads a line containing the number N of elements, and then reads N lines from the input as a list.
      */
-    <T> List<T> readCountAndList(Function<Scanner, T> itemReader) {
+    <T> List<T> readCountAndList(Function<MdfReader, T> itemReader) {
         int n = readIntLine();
         return readNLinesAsList(n, itemReader);
     }
@@ -75,7 +75,7 @@ class MdfReader {
     /**
      * Reads a line containing the number N of elements, and then reads N lines from the input as an array.
      */
-    <T> T[] readCountAndArray(Function<Scanner, T> itemReader, Function<Integer, T[]> arrayCreator) {
+    <T> T[] readCountAndArray(Function<MdfReader, T> itemReader, Function<Integer, T[]> arrayCreator) {
         int n = readIntLine();
         return readNLinesAsArray(n, itemReader, arrayCreator);
     }
