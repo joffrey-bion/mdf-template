@@ -6,13 +6,85 @@ import java.util.function.*;
 
 public class IsoContest {
 
+    static class Color {
+        int V;
+
+        int R;
+
+        int J;
+
+        int O;
+
+        public Color(int[] colors) {
+            V = colors[0];
+            R = colors[1];
+            J = colors[2];
+            O = colors[3];
+        }
+
+        private static Color zero() {
+            return new Color(new int[] {0, 0, 0, 0});
+        }
+
+        public Color plus(Color c) {
+            return new Color(new int[] {V + c.V, R + c.R, J + c.J, O + c.O});
+        }
+
+        public Color minus(Color c) {
+            return new Color(new int[] {
+                    Math.max(0, V - c.V), Math.max(0, R - c.R), Math.max(0, J - c.J), Math.max(0, O - c.O)
+            });
+        }
+
+        public Color times(int dayTotal) {
+            return new Color(new int[] {
+                    V * dayTotal, R * dayTotal, J * dayTotal, O * dayTotal
+            });
+        }
+    }
+
     public static void main(String[] argv) {
         Scanner sc = new Scanner(System.in);
         MdfReader reader = new MdfReader(sc);
 
-        // TODO
+        Color ref = new Color(reader.readIntArrayLine());
+        List<Color> stockPerDay = reader.readNLinesAsList(7, r -> new Color(r.readIntArrayLine()));
 
-        System.out.println();
+        int total = 0;
+
+        for (int i = 0; i < stockPerDay.size(); i++) {
+            Color oldStock = i > 0 ? stockPerDay.get(i - 1) : Color.zero();
+            Color newStock = stockPerDay.get(i);
+            Color stock = oldStock.plus(newStock);
+            int dayTotal = count(stock, ref);
+            total += dayTotal;
+            Color consumed = ref.times(dayTotal);
+            Color remainingFreshStock = newStock.minus(consumed.minus(oldStock));
+            stockPerDay.set(i, remainingFreshStock);
+        }
+
+        System.out.println(total);
+    }
+
+    static int count(Color stock, Color ref) {
+        int maxV = ref.V == 0 ? Integer.MAX_VALUE : (stock.V / ref.V);
+        int maxR = ref.R == 0 ? Integer.MAX_VALUE : (stock.R / ref.R);
+        int maxJ = ref.J == 0 ? Integer.MAX_VALUE : (stock.J / ref.J);
+        int maxO = ref.O == 0 ? Integer.MAX_VALUE : (stock.O / ref.O);
+        return Math.min(Math.min(maxV, maxR), Math.min(maxJ, maxO));
+    }
+
+    static class Solver {
+
+        Map<Color, Integer> cache = new HashMap<>();
+
+        static int solve(Color stock, Color ref) {
+            int maxV = stock.V / ref.V;
+            int maxR = stock.R / ref.R;
+            int maxJ = stock.J / ref.J;
+            int maxO = stock.O / ref.O;
+            return Math.min(Math.min(maxV, maxR), Math.min(maxJ, maxO));
+        }
     }
 
 }
