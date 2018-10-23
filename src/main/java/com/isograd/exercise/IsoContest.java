@@ -3,7 +3,6 @@ package com.isograd.exercise;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.*;
-import java.util.stream.*;
 
 public class IsoContest {
 
@@ -97,6 +96,11 @@ class MdfUtils {
 
     static int sum(List<Integer> ints) {
         return ints.stream().reduce(0, Integer::sum);
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    static double avg(List<Integer> ints) {
+        return ints.stream().mapToInt(i -> i).average().getAsDouble();
     }
 
     /**
