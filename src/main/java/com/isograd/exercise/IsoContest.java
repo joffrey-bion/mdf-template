@@ -84,6 +84,22 @@ class MdfReader {
 @SuppressWarnings({"WeakerAccess", "unused"})
 class MdfUtils {
 
+    private static int min(int i, int j, int k) {
+        return Math.min(i, Math.min(j, k));
+    }
+
+    private static int min(int i, int j, int k, int l) {
+        return Math.min(Math.min(i, j), Math.min(k, l));
+    }
+
+    private static int max(int i, int j, int k) {
+        return Math.max(i, Math.max(j, k));
+    }
+
+    private static int max(int i, int j, int k, int l) {
+        return Math.max(Math.max(i, j), Math.max(k, l));
+    }
+
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     static int min(List<Integer> ints) {
         return ints.stream().reduce(Integer::min).get();
