@@ -10,9 +10,46 @@ public class IsoContest {
         Scanner sc = new Scanner(System.in);
         MdfReader reader = new MdfReader(sc);
 
-        // TODO
+        int[] line1 = reader.readIntArrayLine();
+        int N = line1[0];
+        int M = line1[1];
 
-        System.out.println();
+        double[][] rates = reader.readNLinesAsArray(N, r -> {
+            String[] ss = r.sc.nextLine().split("\\s");
+            return Arrays.stream(ss).mapToDouble(Double::parseDouble).toArray();
+        }, double[][]::new);
+
+        double max = new Solver(rates, M).maxFor(M, 0);
+        System.out.println(max);
+    }
+
+    static class Solver {
+
+        final double[][] rates;
+
+        final Double[][] maxs;
+
+        Solver(double[][] rates, int M) {
+            this.rates = rates;
+            this.maxs = new Double[M + 1][rates.length];
+        }
+
+        double maxFor(int m, int targetCurrency) {
+            if (m == 0) {
+                return targetCurrency == 0 ? 10000 : 0;
+            }
+            if (maxs[m][targetCurrency] != null) {
+                return maxs[m][targetCurrency];
+            }
+            double max = 0.0;
+            for (int fromC = 0; fromC < rates.length; fromC++) {
+                double rate = rates[fromC][targetCurrency];
+                double val = maxFor(m - 1, fromC) * rate;
+                max = Math.max(max, val);
+            }
+            maxs[m][targetCurrency] = max;
+            return max;
+        }
     }
 
 }
