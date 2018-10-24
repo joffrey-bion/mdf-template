@@ -1,4 +1,5 @@
 test-files/input*.txt
+test-files/input*.txt.out
 test-files/output*.txt
 
 # =========================
